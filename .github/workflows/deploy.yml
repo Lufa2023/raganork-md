@@ -26,6 +26,10 @@ jobs:
         npm install -g yarn pm2
         yarn install --ignore-engines --network-concurrency 1
 
+    - name: Set up environment variables
+      run: |
+        echo "SESSION=${{ secrets.SESSION }}" > config.env
+
     - name: Start the bot
       run: |
         pm2 start npm -- start
