@@ -26,9 +26,9 @@ jobs:
         npm install -g yarn pm2
         yarn install --ignore-engines --network-concurrency 1
 
-    - name: Configure bot settings
+    - name: Set session ID in environment
       run: |
-        echo "module.exports = { session: '${{ secrets.SESSION_ID }}' };" > config.js
+        echo "SESSION=${{ secrets.SESSION }}" >> $GITHUB_ENV
 
     - name: Start the bot
       run: |
