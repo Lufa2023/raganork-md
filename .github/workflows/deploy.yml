@@ -1,4 +1,4 @@
-name: Node.js CI
+name: Node.js CI/CD
 
 on:
   push:
@@ -12,25 +12,37 @@ jobs:
 
     strategy:
       matrix:
-        node-version: [20.x]
+        node-version: [14.x] # Adjust the Node.js version as per your requirements
 
     steps:
     - name: Checkout raganork-md repository
       uses: actions/checkout@v3
 
-    - name: Set up Node.js
-      uses: actions/setup-node@v3
+    - name: Set up Node.js and Yarn
+      uses: actions/setup-node@v2
       with:
         node-version: ${{ matrix.node-version }}
+        # Set up yarn alongside Node.js
+        yarn-cache: true
 
-    - name: Install libraries
+    - name: Install dependencies with Yarn
       run: yarn install --network-concurrency 1
 
-    - name: Start raganork-md
-    
-      env:
-          OWNER_NAME: 
-          ALWAYS_ONLINE:
-          SESSION_ID:
+    - name: Set up environment variables
+      run: |
+        echo "SESSION_ID=${{ secrets.SESSION_ID }}" >> $GITHUB_ENV
+        echo "OWNER_NAME=LufaBot" >> $GITHUB_ENV
+        echo "ALWAYS_ONLINE=true" >> $GITHUB_ENV
+       
 
-      run: npm start
+    - name: Start raganork-md with PM2
+      run: |
+        pm2 start yarn --name "raganork-md" -- start
+        pm2 save  # Save current PM2 processes
+
+    - name: Show PM2 logs
+      run: pm2 logs raganork-md --lines 100
+
+    # Optional PM2 operations as previously mentioned
+    # ...
+
